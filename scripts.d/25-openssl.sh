@@ -75,6 +75,11 @@ EOF
             --cross-compile-prefix="$FFBUILD_CROSS_PREFIX"
             linux-aarch64
         )
+    elif [[ $TARGET == android* ]]; then
+        myconf+=(
+            android-arm64
+            -D__ANDROID_API__=$API_LEVEL
+        )
     else
         echo "Unknown target"
         return -1
@@ -83,11 +88,13 @@ EOF
     export CFLAGS="$CFLAGS -fno-strict-aliasing"
     export CXXFLAGS="$CXXFLAGS -fno-strict-aliasing"
 
-    # OpenSSL build system prepends the cross prefix itself
-    export CC="${CC/${FFBUILD_CROSS_PREFIX}/}"
-    export CXX="${CXX/${FFBUILD_CROSS_PREFIX}/}"
-    export AR="${AR/${FFBUILD_CROSS_PREFIX}/}"
-    export RANLIB="${RANLIB/${FFBUILD_CROSS_PREFIX}/}"
+    # OpenSSL build system prepends the cross prefix itself (not for Android, which uses NDK directly)
+    if [[ $TARGET != android* ]]; then
+        export CC="${CC/${FFBUILD_CROSS_PREFIX}/}"
+        export CXX="${CXX/${FFBUILD_CROSS_PREFIX}/}"
+        export AR="${AR/${FFBUILD_CROSS_PREFIX}/}"
+        export RANLIB="${RANLIB/${FFBUILD_CROSS_PREFIX}/}"
+    fi
 
     ./Configure "${myconf[@]}"
 

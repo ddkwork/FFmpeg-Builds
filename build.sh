@@ -27,6 +27,11 @@ GIT_BRANCH="${GIT_BRANCH_OVERRIDE:-$GIT_BRANCH}"
 BUILD_SCRIPT="$(mktemp)"
 trap "rm -f -- '$BUILD_SCRIPT'" EXIT
 
+MERGED_MOUNT=""
+if [[ -n "$FFBUILD_MERGED" ]]; then
+    MERGED_MOUNT="-v $(pwd)/util/merge_libs.sh:/merge_libs.sh"
+fi
+
 cat <<EOF >"$BUILD_SCRIPT"
     set -xe
     cd /ffbuild
@@ -44,9 +49,15 @@ cat <<EOF >"$BUILD_SCRIPT"
     make install install-doc
 EOF
 
+if [[ -n "$FFBUILD_MERGED" ]]; then
+    cat <<EOF >>"$BUILD_SCRIPT"
+    bash /merge_libs.sh /ffbuild/prefix "$TARGET"
+EOF
+fi
+
 [[ -t 1 ]] && TTY_ARG="-t" || TTY_ARG=""
 
-docker run --rm -i $TTY_ARG "${UIDARGS[@]}" -v "$PWD/ffbuild":/ffbuild -v "$BUILD_SCRIPT":/build.sh "$IMAGE" bash /build.sh
+docker run --rm -i $TTY_ARG "${UIDARGS[@]}" -v "$PWD/ffbuild":/ffbuild -v "$BUILD_SCRIPT":/build.sh $MERGED_MOUNT "$IMAGE" bash /build.sh
 
 if [[ -n "$FFBUILD_OUTPUT_DIR" ]]; then
     mkdir -p "$FFBUILD_OUTPUT_DIR"

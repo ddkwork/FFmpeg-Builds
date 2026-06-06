@@ -1,0 +1,18 @@
+[binaries]
+c = '/opt/android-ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang'
+cpp = '/opt/android-ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++'
+ar = '/opt/android-ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar'
+strip = '/opt/android-ndk/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'android'
+cpu_family = 'aarch64'
+cpu = 'armv8-a'
+endian = 'little'
+
+[built-in options]
+c_args = ['-I/opt/ffbuild/include', '-O2', '-fPIC', '-DPIC']
+c_link_args = ['-L/opt/ffbuild/lib', '-O2', '-fPIC']
+cpp_args = ['-I/opt/ffbuild/include', '-O2', '-fPIC', '-DPIC']
+cpp_link_args = ['-L/opt/ffbuild/lib', '-O2', '-fPIC']
